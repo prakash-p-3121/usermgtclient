@@ -7,6 +7,7 @@ import (
 	"github.com/prakash-p-3121/restclientlib"
 	"github.com/prakash-p-3121/usermodel"
 	"log"
+	"net/url"
 )
 
 type UserMgtClientImpl struct {
@@ -31,9 +32,17 @@ func (client *UserMgtClientImpl) UserCreate(req *usermodel.UserCreateReq) (*idge
 func (client *UserMgtClientImpl) UserFindByID(userID string) (*usermodel.User, errorlib.AppError) {
 	restClient := restclientlib.NewRestClient()
 	hostPort := client.HostPort()
-	url := hostPort + userFind
-	log.Println("url =", url)
+	baseUrl := hostPort + userFind
+	log.Println("url =", baseUrl)
+
+	params := url.Values{}
+	params.Add("user-id", userID)
+	encodedParams := params.Encode()
+	log.Println("encodedParams=" + encodedParams)
+	finalUrl := baseUrl + "?" + encodedParams
+	log.Println("finalUrl=" + finalUrl)
+
 	var resp usermodel.User
-	appErr := restClient.Get(url, &resp)
+	appErr := restClient.Get(finalUrl, &resp)
 	return &resp, appErr
 }
